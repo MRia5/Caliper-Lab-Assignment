@@ -17,7 +17,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-chunks", type=int, default=None)
     parser.add_argument("--max-words", type=int, default=900)
     parser.add_argument("--overlap-words", type=int, default=120)
-    parser.add_argument("--provider", choices=["openai", "gemini"], default="openai")
+    parser.add_argument("--provider", choices=["openai", "gemini", "openrouter"], default="openai")
     parser.add_argument("--model", default=None)
     parser.add_argument("--verifier-model", default=None)
     parser.add_argument(

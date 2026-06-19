@@ -4,7 +4,7 @@ from pathlib import Path
 import time
 
 from .chunking import chunk_document
-from .llm import DryRunClient, GeminiClient, LLMClient, OpenAIClient
+from .llm import DryRunClient, GeminiClient, LLMClient, OpenAIClient, OpenRouterClient
 from .models import DatasetRecord
 from .models import GeneratedQA
 from .models import Verification
@@ -55,6 +55,10 @@ def run_pipeline(
         generator_model = model or "gemini-2.5-flash"
         checker_model = verifier_model or generator_model
         llm = GeminiClient(model=generator_model, verifier_model=checker_model)
+    elif provider == "openrouter":
+        generator_model = model or "google/gemini-2.0-flash-001"
+        checker_model = verifier_model or generator_model
+        llm = OpenRouterClient(model=generator_model, verifier_model=checker_model)
     else:
         generator_model = model or "gpt-4o-mini"
         checker_model = verifier_model or generator_model

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import time
 from typing import Any
@@ -114,6 +115,27 @@ Source passage:
             raise
         content = response.choices[0].message.content or "{}"
         return json.loads(content)
+
+
+class OpenRouterClient(OpenAIClient):
+    def __init__(self, model: str, verifier_model: str | None = None) -> None:
+        from openai import OpenAI
+
+        api_key = os.environ.get("OPENROUTER_API_KEY")
+        if not api_key:
+            raise ValueError(
+                "OPENROUTER_API_KEY is not set. Set it in PowerShell before running with --provider openrouter."
+            )
+        self.client = OpenAI(
+            api_key=api_key,
+            base_url="https://openrouter.ai/api/v1",
+            default_headers={
+                "HTTP-Referer": "https://github.com/MRia5/Caliper-Lab-Assignment",
+                "X-Title": "Caliper Lab Assignment",
+            },
+        )
+        self.model = model
+        self.verifier_model = verifier_model or model
 
 
 class GeminiClient(LLMClient):

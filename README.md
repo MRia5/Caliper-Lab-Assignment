@@ -31,6 +31,12 @@ For Gemini instead:
 $env:GEMINI_API_KEY="your_gemini_api_key_here"
 ```
 
+For OpenRouter instead:
+
+```powershell
+$env:OPENROUTER_API_KEY="your_openrouter_api_key_here"
+```
+
 ## Input
 
 Save the raw SEC HTML file here:
@@ -77,6 +83,18 @@ If Gemini is still overloaded, run small batches:
 py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash-lite --output-dir outputs_gemini_batch_00 --questions-per-chunk 1 --verification-mode evidence --request-delay 15 --continue-on-error --chunk-start 0 --max-chunks 3
 
 py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash-lite --output-dir outputs_gemini_batch_03 --questions-per-chunk 1 --verification-mode evidence --request-delay 15 --continue-on-error --chunk-start 3 --max-chunks 3
+```
+
+Run with OpenRouter:
+
+```powershell
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider openrouter --model google/gemini-2.0-flash-001 --output-dir outputs_openrouter --questions-per-chunk 1 --max-chunks 1
+```
+
+Then run the full filing:
+
+```powershell
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider openrouter --model google/gemini-2.0-flash-001 --output-dir outputs_openrouter --questions-per-chunk 1
 ```
 
 For a no-API smoke test:
