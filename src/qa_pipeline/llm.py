@@ -137,6 +137,26 @@ class OpenRouterClient(OpenAIClient):
         self.model = model
         self.verifier_model = verifier_model or model
 
+    def _json_completion(self, model: str, prompt: str) -> dict[str, Any]:
+        response = self.client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": "Return valid JSON only. Do not include Markdown."},
+                {"role": "user", "content": prompt},
+            ],
+        )
+        choices = getattr(response, "choices", None)
+        if not choices:
+            raise RuntimeError(
+                f"OpenRouter model '{model}' returned no choices. Try a different OpenRouter model."
+            )
+        content = choices[0].message.content or ""
+        if not content.strip():
+            raise RuntimeError(
+                f"OpenRouter model '{model}' returned an empty message. Try a different OpenRouter model."
+            )
+        return parse_json_object(content)
+
 
 class GeminiClient(LLMClient):
     def __init__(self, model: str, verifier_model: str | None = None) -> None:
@@ -270,6 +290,21 @@ class DryRunClient(LLMClient):
 def split_sentences(text: str) -> list[str]:
     candidates = re.split(r"(?<=[.!?])\s+", text)
     return [s.strip() for s in candidates if 40 <= len(s.strip()) <= 350]
+
+
+def parse_json_object(content: str) -> dict[str, Any]:
+    cleaned = content.strip()
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```(?:json)?\s*", "", cleaned)
+        cleaned = re.sub(r"\s*```$", "", cleaned)
+    try:
+        return json.loads(cleaned)
+    except json.JSONDecodeError:
+        start = cleaned.find("{")
+        end = cleaned.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            return json.loads(cleaned[start : end + 1])
+        raise
 
 
 def normalize_question_type(value: str) -> str:
