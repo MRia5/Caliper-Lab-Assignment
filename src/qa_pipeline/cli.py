@@ -19,6 +19,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--provider", choices=["openai", "gemini"], default="openai")
     parser.add_argument("--model", default=None)
     parser.add_argument("--verifier-model", default=None)
+    parser.add_argument("--request-delay", type=float, default=0.0)
+    parser.add_argument("--continue-on-error", action="store_true")
     parser.add_argument("--dry-run", action="store_true", help="Run without calling an LLM.")
     return parser
 
@@ -38,6 +40,8 @@ def main() -> None:
         provider=args.provider,
         model=args.model,
         verifier_model=args.verifier_model,
+        request_delay=args.request_delay,
+        continue_on_error=args.continue_on_error,
         dry_run=args.dry_run,
     )
     print(

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+import time
 
 from .chunking import chunk_document
 from .llm import DryRunClient, GeminiClient, LLMClient, OpenAIClient
@@ -19,6 +20,8 @@ def run_pipeline(
     provider: str,
     model: str,
     verifier_model: str | None,
+    request_delay: float,
+    continue_on_error: bool,
     dry_run: bool,
 ) -> dict[str, int]:
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -53,9 +56,35 @@ def run_pipeline(
     rejected: list[dict] = []
 
     for chunk in chunks:
-        generated_items = llm.generate_questions(chunk, questions_per_chunk)
+        try:
+            generated_items = llm.generate_questions(chunk, questions_per_chunk)
+        except Exception as exc:
+            if not continue_on_error:
+                raise
+            rejected.append(error_row(chunk, "generation_error", exc))
+            sleep_between_requests(request_delay)
+            continue
+
+        sleep_between_requests(request_delay)
         for qa_index, qa in enumerate(generated_items):
-            verification = llm.verify_answer(chunk, qa)
+            try:
+                verification = llm.verify_answer(chunk, qa)
+            except Exception as exc:
+                if not continue_on_error:
+                    raise
+                rejected.append(
+                    {
+                        **error_row(chunk, "verification_error", exc),
+                        "question": qa.question,
+                        "answer": qa.answer,
+                        "evidence": qa.evidence,
+                        "question_type": qa.question_type,
+                    }
+                )
+                sleep_between_requests(request_delay)
+                continue
+
+            sleep_between_requests(request_delay)
             row = DatasetRecord(
                 record_id=f"{chunk.chunk_id}-qa-{qa_index:02d}",
                 source_file=chunk.source_file,
@@ -88,4 +117,21 @@ def run_pipeline(
         "chunks": len(chunks),
         "accepted_records": len(accepted),
         "rejected_records": len(rejected),
+    }
+
+
+def sleep_between_requests(request_delay: float) -> None:
+    if request_delay > 0:
+        time.sleep(request_delay)
+
+
+def error_row(chunk, error_type: str, exc: Exception) -> dict:
+    return {
+        "chunk_id": chunk.chunk_id,
+        "source_file": chunk.source_file,
+        "section_title": chunk.section_title,
+        "topic": chunk.topic,
+        "error_type": error_type,
+        "error": str(exc),
+        "source_excerpt": chunk.text[:1200],
     }

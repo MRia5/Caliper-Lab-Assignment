@@ -59,6 +59,12 @@ After the one-chunk smoke test works, run the full filing:
 py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash-lite --output-dir outputs_gemini --questions-per-chunk 3
 ```
 
+For Gemini free-tier stability, throttle requests and keep going if one request fails:
+
+```powershell
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash-lite --output-dir outputs_gemini --questions-per-chunk 1 --request-delay 8 --continue-on-error
+```
+
 For a no-API smoke test:
 
 ```powershell
