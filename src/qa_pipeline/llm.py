@@ -199,12 +199,8 @@ Source passage:
             model=model,
             contents=prompt,
             config={
-                "response_format": {
-                    "text": {
-                        "mime_type": "application/json",
-                        "schema": schema,
-                    }
-                }
+                "response_mime_type": "application/json",
+                "response_json_schema": schema,
             },
         )
         return json.loads(response.text or "{}")
