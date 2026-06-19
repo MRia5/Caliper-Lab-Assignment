@@ -16,6 +16,7 @@ def run_pipeline(
     input_path: Path,
     output_dir: Path,
     questions_per_chunk: int,
+    chunk_start: int,
     max_chunks: int | None,
     max_words: int,
     overlap_words: int,
@@ -36,8 +37,12 @@ def run_pipeline(
         max_words=max_words,
         overlap_words=overlap_words,
     )
+    if chunk_start < 0:
+        raise ValueError("--chunk-start must be 0 or greater.")
     if max_chunks is not None:
-        chunks = chunks[:max_chunks]
+        chunks = chunks[chunk_start : chunk_start + max_chunks]
+    elif chunk_start:
+        chunks = chunks[chunk_start:]
 
     write_chunks(output_dir / "chunks.jsonl", chunks)
 

@@ -71,6 +71,14 @@ To reduce Gemini calls further, generate Q&A with Gemini and use local evidence 
 py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash-lite --output-dir outputs_gemini --questions-per-chunk 1 --verification-mode evidence --request-delay 8 --continue-on-error
 ```
 
+If Gemini is still overloaded, run small batches:
+
+```powershell
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash-lite --output-dir outputs_gemini_batch_00 --questions-per-chunk 1 --verification-mode evidence --request-delay 15 --continue-on-error --chunk-start 0 --max-chunks 3
+
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash-lite --output-dir outputs_gemini_batch_03 --questions-per-chunk 1 --verification-mode evidence --request-delay 15 --continue-on-error --chunk-start 3 --max-chunks 3
+```
+
 For a no-API smoke test:
 
 ```powershell

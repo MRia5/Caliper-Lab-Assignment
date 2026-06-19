@@ -13,6 +13,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("input", type=Path, help="Path to the raw HTML or text filing.")
     parser.add_argument("--output-dir", type=Path, default=Path("outputs"))
     parser.add_argument("--questions-per-chunk", type=int, default=3)
+    parser.add_argument("--chunk-start", type=int, default=0)
     parser.add_argument("--max-chunks", type=int, default=None)
     parser.add_argument("--max-words", type=int, default=900)
     parser.add_argument("--overlap-words", type=int, default=120)
@@ -40,6 +41,7 @@ def main() -> None:
         input_path=args.input,
         output_dir=args.output_dir,
         questions_per_chunk=args.questions_per_chunk,
+        chunk_start=args.chunk_start,
         max_chunks=args.max_chunks,
         max_words=args.max_words,
         overlap_words=args.overlap_words,
