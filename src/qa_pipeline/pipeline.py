@@ -55,10 +55,12 @@ def run_pipeline(
                 record_id=f"{chunk.chunk_id}-qa-{qa_index:02d}",
                 source_file=chunk.source_file,
                 section_title=chunk.section_title,
+                topic=chunk.topic,
                 chunk_id=chunk.chunk_id,
                 question=qa.question,
                 answer=qa.answer,
                 evidence=qa.evidence,
+                question_type=qa.question_type,
                 verification_label=verification.label,
                 verification_rationale=verification.rationale,
                 model=generator_model,
@@ -82,4 +84,3 @@ def run_pipeline(
         "accepted_records": len(accepted),
         "rejected_records": len(rejected),
     }
-

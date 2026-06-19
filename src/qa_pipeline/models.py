@@ -20,6 +20,7 @@ class GeneratedQA:
     question: str
     answer: str
     evidence: str
+    question_type: str
 
 
 @dataclass(frozen=True)
@@ -33,10 +34,12 @@ class DatasetRecord:
     record_id: str
     source_file: str
     section_title: str
+    topic: str
     chunk_id: str
     question: str
     answer: str
     evidence: str
+    question_type: str
     verification_label: str
     verification_rationale: str
     model: str

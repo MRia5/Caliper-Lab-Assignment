@@ -61,6 +61,7 @@ Each accepted dataset row contains:
 - `section_title`
 - `topic`
 - `chunk_id`
+- `question_type`
 - `question`
 - `answer`
 - `evidence`
