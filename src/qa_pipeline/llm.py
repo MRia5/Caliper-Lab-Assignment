@@ -95,14 +95,22 @@ Source passage:
         return Verification(label=label, rationale=str(data.get("rationale", "")).strip())
 
     def _json_completion(self, model: str, prompt: str) -> dict[str, Any]:
-        response = self.client.chat.completions.create(
-            model=model,
-            response_format={"type": "json_object"},
-            messages=[
-                {"role": "system", "content": "Return valid JSON only."},
-                {"role": "user", "content": prompt},
-            ],
-        )
+        try:
+            response = self.client.chat.completions.create(
+                model=model,
+                response_format={"type": "json_object"},
+                messages=[
+                    {"role": "system", "content": "Return valid JSON only."},
+                    {"role": "user", "content": prompt},
+                ],
+            )
+        except Exception as exc:
+            if exc.__class__.__name__ == "RateLimitError" and "insufficient_quota" in str(exc):
+                raise RuntimeError(
+                    "OpenAI API quota is unavailable for this key/project. "
+                    "Check billing, credits, project limits, or use another API key."
+                ) from exc
+            raise
         content = response.choices[0].message.content or "{}"
         return json.loads(content)
 
