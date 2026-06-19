@@ -88,13 +88,13 @@ py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemi
 Run with OpenRouter:
 
 ```powershell
-py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider openrouter --model google/gemini-2.0-flash-001 --output-dir outputs_openrouter --questions-per-chunk 1 --max-chunks 1
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider openrouter --model nex-agi/nex-n2-pro:free --output-dir outputs_openrouter --questions-per-chunk 1 --verification-mode evidence --max-chunks 1
 ```
 
 Then run the full filing:
 
 ```powershell
-py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider openrouter --model google/gemini-2.0-flash-001 --output-dir outputs_openrouter --questions-per-chunk 1
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider openrouter --model nex-agi/nex-n2-pro:free --output-dir outputs_openrouter --questions-per-chunk 1 --verification-mode evidence
 ```
 
 For a no-API smoke test:

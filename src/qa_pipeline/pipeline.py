@@ -56,7 +56,7 @@ def run_pipeline(
         checker_model = verifier_model or generator_model
         llm = GeminiClient(model=generator_model, verifier_model=checker_model)
     elif provider == "openrouter":
-        generator_model = model or "google/gemini-2.0-flash-001"
+        generator_model = model or "nex-agi/nex-n2-pro:free"
         checker_model = verifier_model or generator_model
         llm = OpenRouterClient(model=generator_model, verifier_model=checker_model)
     else:
