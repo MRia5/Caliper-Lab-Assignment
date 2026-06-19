@@ -7,7 +7,7 @@ The pipeline:
 1. Parses a raw HTML or text filing.
 2. Splits it into section-aware chunks.
 3. Uses an LLM to generate questions and answers from each chunk.
-4. Uses a separate LLM verification pass to check whether each answer is supported by the source passage.
+4. Uses a separate LLM verification pass to check whether each answer is actually supported by the source passage.
 5. Writes a structured dataset as JSONL and CSV.
 
 ## Setup
@@ -31,6 +31,8 @@ Save the raw SEC HTML file here:
 ```text
 raw_inputs/aapl-20250927.htm
 ```
+
+The pipeline checks for SEC automated-tool block pages and stops if the saved input is not the real filing.
 
 ## Run
 
@@ -64,4 +66,3 @@ Each accepted dataset row contains:
 - `verification_rationale`
 - `model`
 - `verifier_model`
-
