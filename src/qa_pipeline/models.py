@@ -8,6 +8,7 @@ class Chunk:
     chunk_id: str
     source_file: str
     section_title: str
+    topic: str
     section_index: int
     text: str
     start_char: int
@@ -40,4 +41,3 @@ class DatasetRecord:
     verification_rationale: str
     model: str
     verifier_model: str
-

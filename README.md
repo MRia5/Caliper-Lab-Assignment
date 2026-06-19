@@ -59,6 +59,7 @@ Each accepted dataset row contains:
 - `record_id`
 - `source_file`
 - `section_title`
+- `topic`
 - `chunk_id`
 - `question`
 - `answer`
