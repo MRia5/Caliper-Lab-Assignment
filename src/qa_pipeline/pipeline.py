@@ -6,6 +6,8 @@ import time
 from .chunking import chunk_document
 from .llm import DryRunClient, GeminiClient, LLMClient, OpenAIClient
 from .models import DatasetRecord
+from .models import GeneratedQA
+from .models import Verification
 from .parsing import load_document
 from .writers import write_chunks, write_dataset, write_jsonl
 
@@ -20,6 +22,7 @@ def run_pipeline(
     provider: str,
     model: str,
     verifier_model: str | None,
+    verification_mode: str,
     request_delay: float,
     continue_on_error: bool,
     dry_run: bool,
@@ -68,7 +71,7 @@ def run_pipeline(
         sleep_between_requests(request_delay)
         for qa_index, qa in enumerate(generated_items):
             try:
-                verification = llm.verify_answer(chunk, qa)
+                verification = verify_generated_answer(llm, chunk, qa, verification_mode)
             except Exception as exc:
                 if not continue_on_error:
                     raise
@@ -84,7 +87,8 @@ def run_pipeline(
                 sleep_between_requests(request_delay)
                 continue
 
-            sleep_between_requests(request_delay)
+            if verification_mode == "llm":
+                sleep_between_requests(request_delay)
             row = DatasetRecord(
                 record_id=f"{chunk.chunk_id}-qa-{qa_index:02d}",
                 source_file=chunk.source_file,
@@ -135,3 +139,17 @@ def error_row(chunk, error_type: str, exc: Exception) -> dict:
         "error": str(exc),
         "source_excerpt": chunk.text[:1200],
     }
+
+
+def verify_generated_answer(llm: LLMClient, chunk, qa: GeneratedQA, verification_mode: str) -> Verification:
+    if verification_mode == "llm":
+        return llm.verify_answer(chunk, qa)
+    if verification_mode == "evidence":
+        evidence = qa.evidence.strip()
+        if evidence and evidence in chunk.text:
+            return Verification("supported", "The evidence appears verbatim in the source chunk.")
+        return Verification(
+            "partial",
+            "The answer was generated from the chunk, but the evidence was not found verbatim.",
+        )
+    return Verification("not_verified", "Verification was skipped for this run.")

@@ -32,4 +32,3 @@ def write_csv(path: Path, rows: list[dict]) -> None:
         writer = csv.DictWriter(file, fieldnames=list(rows[0].keys()))
         writer.writeheader()
         writer.writerows(rows)
-
