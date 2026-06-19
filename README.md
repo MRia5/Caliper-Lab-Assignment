@@ -25,6 +25,12 @@ Set your API key:
 $env:OPENAI_API_KEY="your_api_key_here"
 ```
 
+For Gemini instead:
+
+```powershell
+$env:GEMINI_API_KEY="your_gemini_api_key_here"
+```
+
 ## Input
 
 Save the raw SEC HTML file here:
@@ -39,6 +45,18 @@ The pipeline checks for SEC automated-tool block pages and stops if the saved in
 
 ```powershell
 py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --output-dir outputs --questions-per-chunk 3
+```
+
+Run with Gemini:
+
+```powershell
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash --output-dir outputs_gemini --questions-per-chunk 3 --max-chunks 1
+```
+
+After the one-chunk smoke test works, run the full filing:
+
+```powershell
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash --output-dir outputs_gemini --questions-per-chunk 3
 ```
 
 For a no-API smoke test:

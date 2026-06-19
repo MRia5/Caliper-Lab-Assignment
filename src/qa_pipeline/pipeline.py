@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .chunking import chunk_document
-from .llm import DryRunClient, LLMClient, OpenAIClient
+from .llm import DryRunClient, GeminiClient, LLMClient, OpenAIClient
 from .models import DatasetRecord
 from .parsing import load_document
 from .writers import write_chunks, write_dataset, write_jsonl
@@ -16,6 +16,7 @@ def run_pipeline(
     max_chunks: int | None,
     max_words: int,
     overlap_words: int,
+    provider: str,
     model: str,
     verifier_model: str | None,
     dry_run: bool,
@@ -39,10 +40,14 @@ def run_pipeline(
         llm = DryRunClient()
         generator_model = "dry-run"
         checker_model = "dry-run"
+    elif provider == "gemini":
+        generator_model = model or "gemini-2.5-flash"
+        checker_model = verifier_model or generator_model
+        llm = GeminiClient(model=generator_model, verifier_model=checker_model)
     else:
-        llm = OpenAIClient(model=model, verifier_model=verifier_model)
-        generator_model = model
-        checker_model = verifier_model or model
+        generator_model = model or "gpt-4o-mini"
+        checker_model = verifier_model or generator_model
+        llm = OpenAIClient(model=generator_model, verifier_model=checker_model)
 
     accepted: list[DatasetRecord] = []
     rejected: list[dict] = []

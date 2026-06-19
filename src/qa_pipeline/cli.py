@@ -16,7 +16,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--max-chunks", type=int, default=None)
     parser.add_argument("--max-words", type=int, default=900)
     parser.add_argument("--overlap-words", type=int, default=120)
-    parser.add_argument("--model", default="gpt-4o-mini")
+    parser.add_argument("--provider", choices=["openai", "gemini"], default="openai")
+    parser.add_argument("--model", default=None)
     parser.add_argument("--verifier-model", default=None)
     parser.add_argument("--dry-run", action="store_true", help="Run without calling an LLM.")
     return parser
@@ -34,6 +35,7 @@ def main() -> None:
         max_chunks=args.max_chunks,
         max_words=args.max_words,
         overlap_words=args.overlap_words,
+        provider=args.provider,
         model=args.model,
         verifier_model=args.verifier_model,
         dry_run=args.dry_run,
@@ -44,4 +46,3 @@ def main() -> None:
         f"{summary['accepted_records']} accepted records, "
         f"{summary['rejected_records']} rejected records."
     )
-

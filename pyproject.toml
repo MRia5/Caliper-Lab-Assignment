@@ -9,6 +9,7 @@ description = "Pipeline for generating verified QA datasets from SEC filings."
 requires-python = ">=3.10"
 dependencies = [
   "openai>=1.0.0",
+  "google-genai>=1.0.0",
 ]
 
 [project.optional-dependencies]
