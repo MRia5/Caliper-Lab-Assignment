@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import time
 from typing import Any
 
 from .models import Chunk, GeneratedQA, Verification
@@ -195,15 +196,27 @@ Source passage:
         return Verification(label=label, rationale=str(data.get("rationale", "")).strip())
 
     def _json_completion(self, model: str, prompt: str, schema: dict[str, Any]) -> dict[str, Any]:
-        response = self.client.models.generate_content(
-            model=model,
-            contents=prompt,
-            config={
-                "response_mime_type": "application/json",
-                "response_json_schema": schema,
-            },
-        )
-        return json.loads(response.text or "{}")
+        last_error: Exception | None = None
+        for attempt in range(4):
+            try:
+                response = self.client.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                    config={
+                        "response_mime_type": "application/json",
+                        "response_json_schema": schema,
+                    },
+                )
+                return json.loads(response.text or "{}")
+            except Exception as exc:
+                last_error = exc
+                if not is_retryable_gemini_error(exc) or attempt == 3:
+                    break
+                time.sleep(2**attempt)
+        raise RuntimeError(
+            "Gemini API request failed after retries. If the error mentions high demand, "
+            "try --model gemini-2.5-flash-lite or rerun after a few minutes."
+        ) from last_error
 
 
 class DryRunClient(LLMClient):
@@ -242,6 +255,21 @@ def normalize_question_type(value: str) -> str:
     if normalized in {"factual", "comparison", "causal", "risk"}:
         return normalized
     return "factual"
+
+
+def is_retryable_gemini_error(exc: Exception) -> bool:
+    message = str(exc).lower()
+    status_code = getattr(exc, "status_code", None)
+    return status_code in {429, 500, 502, 503, 504} or any(
+        text in message
+        for text in [
+            "503",
+            "unavailable",
+            "high demand",
+            "rate limit",
+            "resource exhausted",
+        ]
+    )
 
 
 def qa_generation_schema() -> dict[str, Any]:

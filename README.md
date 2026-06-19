@@ -50,13 +50,13 @@ py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --output-dir outputs --questio
 Run with Gemini:
 
 ```powershell
-py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash --output-dir outputs_gemini --questions-per-chunk 3 --max-chunks 1
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash-lite --output-dir outputs_gemini --questions-per-chunk 3 --max-chunks 1
 ```
 
 After the one-chunk smoke test works, run the full filing:
 
 ```powershell
-py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash --output-dir outputs_gemini --questions-per-chunk 3
+py -3 -m qa_pipeline raw_inputs/aapl-20250927.htm --provider gemini --model gemini-2.5-flash-lite --output-dir outputs_gemini --questions-per-chunk 3
 ```
 
 For a no-API smoke test:
